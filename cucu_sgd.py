@@ -5,8 +5,8 @@ import theano, theano.tensor as T
 
 import random, glob
 
-random.seed(1234)
-numpy.random.seed(1234)
+# random.seed(1234)
+# numpy.random.seed(1234)
 
 n_in = 9 * 1024
 n_out = 10
@@ -40,7 +40,7 @@ class LogisticRegression(object):
             raise NotImplementedError()
 
 
-def split_data(x, y, rtn=0.8, rvd=0.1, rtt=0.1):
+def split_data(x, y, rtn=0.64, rvd=0.18, rtt=0.18):
     tnn, vdn, ttn = [int(len(y) * rr) for rr in [rtn, rvd, rtt]]
     train_set, valid_set, test_set = [x[0:tnn], y[0:tnn]], [x[tnn:tnn+vdn], y[tnn:tnn+vdn]], [x[tnn+vdn:tnn+vdn+ttn], y[tnn+vdn:tnn+vdn+ttn]]
     return train_set, valid_set, test_set
