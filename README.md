@@ -11,3 +11,13 @@ epoch 1000 (TITANXで40秒程度) での結果 (test_samples()で実行可能)
 |train|263 / 5376|4.89 %|
 |dev|65 / 1512|4.3 %|
 |test|57 / 1512|3.77 %|
+
+###cucu_mlp.py
+http://deeplearning.net/tutorial/ のコードを使用  
+
+|data|errors|
+|-----------:|------------:|------------:|
+|train|49.03 %|
+|dev|13.93 %|
+|test|13.77 %|
+
