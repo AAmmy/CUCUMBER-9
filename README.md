@@ -4,7 +4,7 @@
 
 ###cucu_sgd.py
 http://deeplearning.net/tutorial/ のコードを使用  
-epoch 1000 (TITANXで40秒程度) での結果  
+epoch 1000 (TITANXで40秒程度) での結果 (test_samples()で実行可能)  
 
 |data|errors|%|
 |-----------:|------------:|------------:|
