@@ -4,7 +4,7 @@ __docformat__ = 'restructedtext en'
 import os, sys, timeit, numpy
 import theano
 import theano.tensor as T
-from cucu_sgd import LogisticRegression, load_data
+from cucu_sgd import LogisticRegression, load_data, load_data_
 
 import six.moves.cPickle as pickle
 import cucu_sgd
@@ -220,27 +220,29 @@ def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0000, n_epochs=100000,
 if __name__ == '__main__':
     test_mlp()
 
-def load_params():
-    wh = numpy.fromfile('mlp_wh', dtype='float32').reshape((n_in, n_hid))
-    bh = numpy.fromfile('mlp_bh', dtype='float32')
-    wl = numpy.fromfile('mlp_wl', dtype='float32').reshape((n_hid, n_out))
-    bl = numpy.fromfile('mlp_bl', dtype='float32')
-    return wh, bh, wl, bl
 
 def test_samples(): # directly calculate from W, b
     # load params and predict by original and own function without theano
+    def load_params():
+        wh = numpy.fromfile('mlp_wh', dtype='float32').reshape((n_in, n_hid))
+        bh = numpy.fromfile('mlp_bh', dtype='float32')
+        wl = numpy.fromfile('mlp_wl', dtype='float32').reshape((n_hid, n_out))
+        bl = numpy.fromfile('mlp_bl', dtype='float32')
+        return wh, bh, wl, bl
+
     def pred(x, wh, bh, wl, bl):
-        oh = numpy.tanh(numpy.dot(x, wh) + bh) # tanh(WX + b)
+        oh = numpy.tanh(numpy.dot(x, wh) + bh)
         o = numpy.dot(oh, wl) + bl
         res = numpy.argmax(o)
         return res
 
+    def ch_all(tset, wh, bh, wl, bl):
+        res = [pred(x, wh, bh, wl, bl) for x in tset[0]]
+        errs = list(res == tset[1]).count(False)
+        print (errs, '/', len(tset[0]), round(float(errs) / len(tset[0]), 4) * 100, '%')
+        
     wh, bh, wl, bl = load_params()
     trs, vds, tts = load_data_()
     
-    for tset in [trs, vds, tts]:
-        test_x, test_y = tset
-        res = [pred(x, wh, bh, wl, bl) for x in test_x]
-        t = [pr == gt for pr, gt in zip(res, test_y)].count(True)
-        print (t / 100., '%')
+    for st in [trs, vds, tts]:ch_all(st, wh, bh, wl, bl)
 

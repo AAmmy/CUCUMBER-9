@@ -218,26 +218,20 @@ if __name__ == '__main__':
     sgd_optimization_mnist()
 
 def test_samples(): # directly calculate from W, b
-    def pred(d, tset):
-        x = tset[0][d]
-        o = numpy.dot(x,w) + b
+    def pred(x, w, b):
+        o = numpy.dot(x, w) + b
         pred = numpy.argmax(o)
-        # print 'pred', pred, ', GT', tset[1][d]
-        return pred, tset[1][d], o
+        return pred
         
-    def ch_all(tset):
-        errs = 0
-        for t in range(len(tset[0])):
-            a, b, o = pred(t, tset)
-            if not a == b:
-                # print "error"
-                errs += 1
+    def ch_all(tset, w, b):
+        res = [pred(x, w, b) for x in tset[0]]
+        errs = list(res == tset[1]).count(False)
         print errs, '/', len(tset[0]), round(float(errs) / len(tset[0]), 4) * 100, '%'
         
     w = numpy.fromfile('sgd_w', dtype='float32').reshape((n_in, n_out))
     b = numpy.fromfile('sgd_b', dtype='float32')
-    
     trs, vds, tts = load_data_()
-    for st in [trs, vds, tts]:ch_all(st)
+
+    for st in [trs, vds, tts]:ch_all(st, w, b)
 
 
