@@ -1,11 +1,7 @@
-__docformat__ = 'restructedtext en'
 import six.moves.cPickle as pickle
 import gzip, os, sys, timeit, numpy
 import theano, theano.tensor as T
 
-import random, glob
-
-# random.seed(1234)
 # numpy.random.seed(1234)
 
 n_in = 9 * 1024
@@ -47,10 +43,10 @@ def split_data(x, y, rtn=0.64, rvd=0.18, rtt=0.18):
 
 
 def load_data_():
+    # load datasets
     x = numpy.array([]).astype('uint8')
     y = numpy.array([]).astype('uint8')
     nx = 0
-
     for i in range(1, 7):
         path = 'p2/data_batch_' + str(i)
         d = pickle.load(open(path, 'rb'))
@@ -59,11 +55,14 @@ def load_data_():
         nx += tx.shape[0]
         x = numpy.append(x, tx)
         y = numpy.append(y, ty)
-
     x = x.reshape((nx, x.shape[0] / nx))
+    
+    # shuffle
     xy = numpy.array(zip(x, y))
     numpy.random.shuffle(xy)
     x, y = xy.transpose()
+
+    # rearrange as uint 8 from object type
     nx = numpy.zeros((x.shape[0], n_in)).astype('uint8')
     for i, xx in enumerate(x):
         nx[i:i+1] = xx
@@ -86,13 +85,13 @@ def data_to_tensor(train_set, valid_set, test_set):
     rval = [(train_set_x, train_set_y), (valid_set_x, valid_set_y), (test_set_x, test_set_y)]
     return rval
 
-def load_data(dataset):
+def load_data():
     train_set, valid_set, test_set = load_data_()
     rval = data_to_tensor(train_set, valid_set, test_set)
     return rval
 
-def sgd_optimization_mnist(learning_rate=0.0013, n_epochs=100000, dataset='mnist.pkl.gz', batch_size=batch_size):
-    datasets = load_data(dataset)
+def sgd_optimization_mnist(learning_rate=0.0013, n_epochs=100000, batch_size=batch_size):
+    datasets = load_data()
 
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
@@ -166,7 +165,6 @@ def sgd_optimization_mnist(learning_rate=0.0013, n_epochs=100000, dataset='mnist
     epoch = 0
     while (epoch < n_epochs) and (not done_looping):
         epoch = epoch + 1
-        # learning_rate = random.random() / 100
         for minibatch_index in range(n_train_batches):
 
             minibatch_avg_cost = train_model(minibatch_index)
@@ -192,8 +190,7 @@ def sgd_optimization_mnist(learning_rate=0.0013, n_epochs=100000, dataset='mnist
                     print(('     epoch %i, minibatch %i/%i, test error of best model %f%%') %
                         (epoch, minibatch_index + 1, n_train_batches, test_score * 100.))
 
-                    # with open('best_model.pkl', 'wb') as f:
-                        # pickle.dump(classifier, f)
+                    # with open('best_model.pkl', 'wb') as f: pickle.dump(classifier, f)
                     classifier.W.get_value().tofile('sgd_w')
                     classifier.b.get_value().tofile('sgd_b')
 
@@ -232,6 +229,5 @@ def test_samples(): # directly calculate from W, b
     b = numpy.fromfile('sgd_b', dtype='float32')
     trs, vds, tts = load_data_()
 
-    for st in [trs, vds, tts]:ch_all(st, w, b)
-
+    for st in [trs, vds, tts]: ch_all(st, w, b)
 

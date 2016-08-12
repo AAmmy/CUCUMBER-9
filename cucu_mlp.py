@@ -1,6 +1,4 @@
-# f(x) = G( b^{(2)} + W^{(2)}( s( b^{(1)} + W^{(1)} x))),
 from __future__ import print_function
-__docformat__ = 'restructedtext en'
 import os, sys, timeit, numpy
 import theano
 import theano.tensor as T
@@ -82,8 +80,8 @@ class MLP(object):
 
 
 def test_mlp(learning_rate=0.0001, L1_reg=0.00, L2_reg=0.0000, n_epochs=100000,
-             dataset='mnist.pkl.gz', batch_size=100, n_hidden=n_hid):
-    datasets = load_data(dataset)
+             batch_size=100, n_hidden=n_hid):
+    datasets = load_data()
 
     train_set_x, train_set_y = datasets[0]
     valid_set_x, valid_set_y = datasets[1]
@@ -222,7 +220,6 @@ if __name__ == '__main__':
 
 
 def test_samples(): # directly calculate from W, b
-    # load params and predict by original and own function without theano
     def load_params():
         wh = numpy.fromfile('mlp_wh', dtype='float32').reshape((n_in, n_hid))
         bh = numpy.fromfile('mlp_bh', dtype='float32')
